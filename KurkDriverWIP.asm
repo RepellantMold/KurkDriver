@@ -1438,6 +1438,15 @@ loc_726CC:
 loc_726D6:
 		bclr	#2,$40(a6)
 		clr.b	$24(a6)
+
+		tst.b	$40(a6)					; is the DAC channel running?
+		bpl.s	Resume_NoDAC				; if not, branch
+
+		moveq	#$FFFFFFB6,d0				; prepare FM channel 3/6 L/R/AMS/FMS address
+		move.b	$4A(a6),d1				; load DAC channel's L/R/AMS/FMS value
+		jmp	sub_72764(pc)				; write to FM 6
+
+Resume_NoDAC:
 		rts	
 ; End of function sub_7267C
 
@@ -1942,6 +1951,14 @@ loc_72B78:
 
 loc_72B9E:				; XREF: loc_72A64
 		move.b	(a4)+,2(a5)
+		tst.b	$40(a6)			; is the DAC channel running?
+		bmi.s	Restore_NoFM6		; if it is, branch
+
+		moveq	#$2B,d0			; DAC enable/disable register
+		moveq	#0,d1			; Disable DAC
+		jsr	sub_7272E(pc)
+
+Restore_NoFM6:
 		rts	
 ; ===========================================================================
 
