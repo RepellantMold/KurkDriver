@@ -25,19 +25,42 @@ Go_PSGIndex:	dc.l PSG_Index		; XREF: sub_72926
 ; ---------------------------------------------------------------------------
 ; PSG instruments used in music
 ; ---------------------------------------------------------------------------
-PSG_Index:	dc.l PSG1, PSG2, PSG3
-		dc.l PSG4, PSG5, PSG6
-		dc.l PSG7, PSG8, PSG9
-PSG1:		incbin	sound\psg1.bin
-PSG2:		incbin	sound\psg2.bin
-PSG3:		incbin	sound\psg3.bin
-PSG4:		incbin	sound\psg4.bin
-PSG6:		incbin	sound\psg6.bin
-PSG5:		incbin	sound\psg5.bin
-PSG7:		incbin	sound\psg7.bin
-PSG8:		incbin	sound\psg8.bin
-PSG9:		incbin	sound\psg9.bin
+		dc.l  		PSG_Tone00,PSG_Tone01,PSG_Tone02,PSG_Tone03
+		dc.l 		PSG_Tone04,PSG_Tone05,PSG_Tone06,PSG_Tone07
+		dc.l		PSG_Tone08
+					
+PSG_Tone00:
+		dc.b   	0,	 0,  0,	 1,  1,	 1,  2,	 2,  2,	 3,  3,	 3
+		dc.b	4,	 4,  4,	 5,  5,	 5,  6,	 6,  6,	 7,$80
+PSG_Tone01:
+		dc.b    0,   2,   4,   6,   8, $10, $80
+PSG_Tone02:
+		dc.b	0,   0,   1,   1,   2,   2,   3,   3,   4,   4
+		dc.b 	5,   5,   6,   6,   7,   7, $80
+PSG_Tone03:
+		dc.b  	0,   0,   2,   3,   4,   4,   5,   5,   5,   6, $80
+PSG_Tone05:
+		dc.b   	3,	 3,  3,	 2,  2,	 2,  2,	 1,  1,	 1,  0,	 0
+		dc.b	0,	 0,$80
+PSG_Tone04:
+		dc.b   	0,	 0,  0,	 0,  0,	 0,  0,	 0,  0,	 0,  1,	 1
+		dc.b	1,	 1,  1,	 1,  1,	 1,  1,	 1,  1,	 1
+		dc.b	1,	 1,  2,	 2,  2,	 2,  2,	 2,  2,	 2
+		dc.b   	3,	 3,  3,	 3,  3,	 3,  3,	 3,  4,$80
+PSG_Tone06:
+		dc.b   	0,	 0,  0,	 0,  0,	 0,  1,	 1,  1,	 1,  1,	 2
+		dc.b	2,	 2,  2,	 2,  3,	 3,  3,	 4,  4,	 4
+		dc.b	5,	 5,  5,	 6,  7,$80
+PSG_Tone07:
+		dc.b   	0,	 0,  0,	 0,  0,	 1,  1,	 1,  1,	 1,  2,	 2
+		dc.b	2,	 2,  2,	 2,  3,	 3,  3,	 3,  3,	 4
+		dc.b	4,	 4,  4,	 4,  5,	 5,  5,	 5,  5,	 6
+		dc.b   	6,	 6,  6,	 6,  7,	 7,  7,$80
+PSG_Tone08:
+		dc.b   	0,	 1,  2,	 3,  4,	 5,  6,	 7,  8,	 9,$0A,$0B
+		dc.b	$0C,$0D,$0E,$0F,$80
 
+;THIS IS THE TABLE FOR SPEED SHOES TEMPO INCREASES! IF YOU ADD SONGS, ADD MORE VALUES HERE!
 byte_71A94:	dc.b 7,	$72, $73, $26, $15, 8, $FF, 5
 ; ---------------------------------------------------------------------------
 ; Music	Pointers
@@ -71,7 +94,7 @@ sub_71B4C:				; XREF: loc_B10; PalToCRAM
 		move.w	#$100,($A11100).l ; stop the Z80
 		nop	
 		nop	
-		nop	
+		nop
 
 loc_71B5A:
 		btst	#0,($A11100).l
