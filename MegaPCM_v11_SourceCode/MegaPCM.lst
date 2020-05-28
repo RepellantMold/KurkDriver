@@ -1,4 +1,4 @@
- AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 1 - 8/5/2012 14:56:18
+ AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 1 - 5/27/2020 16:21:03
 
 
        1/       0 :                     
@@ -61,7 +61,7 @@
       58/       A : 67                  	ld	h,a
       59/       B : 6F                  	ld	l,a
       60/       C : 22 B2 00            	ld	(Ptr_InitPlayback),hl	; reset 'InitPlayback' event
- AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 2 - 8/5/2012 14:56:18
+ AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 2 - 5/27/2020 16:21:03
 
 
       61/       F : 22 B5 00            	ld	(Ptr_SoundProc),hl	; reset 'SoundProc' event
@@ -124,7 +124,7 @@
      118/      56 :                     ; ---------------------------------------------------------------
      119/      56 :                     
      120/      56 :                     SetupDAC:
- AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 3 - 8/5/2012 14:56:18
+ AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 3 - 5/27/2020 16:21:03
 
 
      121/      56 : FD 36 00 2B         	ld	(iy+0),2Bh		;
@@ -187,7 +187,7 @@
      170/      BD :                     ;	You may do push/pop from stack though.
      171/      BD :                     ;	'StopDAC' is expection, as it breaks playback anyway.
      172/      BD :                     ; ---------------------------------------------------------------
- AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 4 - 8/5/2012 14:56:18
+ AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 4 - 5/27/2020 16:21:03
 
 
      173/      BD :                     
@@ -250,7 +250,7 @@
      230/      F1 :                     ; Bank-Switch Registers Set:
      231/      F1 :                     ;	b'	= Current Bank Number
      232/      F1 :                     ;	c'	= Last Bank Number
- AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 5 - 8/5/2012 14:56:18
+ AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 5 - 5/27/2020 16:21:03
 
 
      233/      F1 :                     ;	de'	= Bank Register
@@ -313,7 +313,7 @@
      290/     128 :                     ; ---------------------------------------------------------------
      291/     128 :                     ; PCM Registers Set:
      292/     128 :                     ;	B	= Pitch Counter
- AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 6 - 8/5/2012 14:56:18
+ AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 6 - 5/27/2020 16:21:03
 
 
      293/     128 :                     ;	C	= Pitch
@@ -376,7 +376,7 @@
      350/     15E :                     	; Synchronization loop (20 cycles)
      351/     15E : D9                  +	exx				; 4
      352/     15F : 00                  	nop				; 4
- AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 7 - 8/5/2012 14:56:18
+ AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 7 - 5/27/2020 16:21:03
 
 
      353/     160 : 18 F2               	jr	-			; 12
@@ -439,7 +439,7 @@
      410/     192 : 10 FE               	djnz	$			; 7/13+	; wait until pitch zero
      411/     194 : 32 01 40            	ld	(YM_Port0_Data),a	; 13	; write to DAC
      412/     197 : 47                  	ld	b,a			; 4	; b = DAC Value
- AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 8 - 8/5/2012 14:56:18
+ AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 8 - 5/27/2020 16:21:03
 
 
      413/     198 :                     	; Cycles: 73
@@ -495,14 +495,14 @@
      463/     1CF :                     
      464/     1CF :                     ; ---------------------------------------------------------------
      465/     1CF :                     ; Best cycles per loop:	221/2
-     466/     1CF :                     ; Max possible rate:	32 kHz (PAL)
+     466/     1CF :                     ; Max possible rate:	3,550 kHz / 111 = 32 kHz (PAL)
      467/     1CF :                     ; ---------------------------------------------------------------
      468/     1CF :                                                             
      469/     1CF :                     	align	100h	; it's important to align this way, or the code above won't work properly
      470/     200 :                     
      471/     200 :                     DPCM_DeltaArray:
      472/     200 : 00 01 02 04 08 10   	db	0, 1, 2, 4, 8, 10h, 20h, 40h
- AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 9 - 8/5/2012 14:56:18
+ AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 9 - 5/27/2020 16:21:03
 
 
                     20 40 
@@ -526,7 +526,7 @@
      489/     210 :                     
      490/     210 :                     DAC_Table:
      491/     210 :                     
- AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 10 - 8/5/2012 14:56:18
+ AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 10 - 5/27/2020 16:21:03
 
 
   symbol table (* = unused):
@@ -536,7 +536,7 @@
 *BIGENDIAN :                      0 - | *BRANCHEXT :                      0 - |
 *CASESENSITIVE :                  0 - | *CONSTPI :        3.141592653589793 - |
  DAC_NUMBER :                  1FFF - |  DAC_TABLE :                    210 C |
-*DATE :                    8/5/2012 - |  DPCM_DELTAARRAY :              200 C |
+*DATE :                   5/27/2020 - |  DPCM_DELTAARRAY :              200 C |
  EVENTS_LIST :                   71 C |  EVENT_ENDPLAYBACK :             BA C |
  EVENT_INITPLAYBACK :            B1 C |  EVENT_INTERRUPT :               B7 C |
  EVENT_SOUNDPROC :               B4 C |  E_BANK :                         3 - |
@@ -563,7 +563,7 @@
  RELOAD_PCM :                   128 C |  SETUPDAC :                      56 C |
  STACK :                       1FF0 - |  STOPDAC :                       EA C |
  S_BANK :                         2 - |  S_POS :                          4 - |
-*TIME :                    14:56:18 - | *TRUE :                           1 - |
+*TIME :                    16:21:03 - | *TRUE :                           1 - |
 *VERSION :                     142F - |  YM_PORT0_CTRL :               4000 - |
  YM_PORT0_DATA :               4001 - | *YM_PORT1_CTRL :               4002 - |
 *YM_PORT1_DATA :               4003 - |  __BACK0 :                       4C C |
@@ -577,7 +577,7 @@
      81 symbols
      30 unused symbols
 
- AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 11 - 8/5/2012 14:56:18
+ AS V1.42 Beta [Bld 55] - source file MegaPCM.asm - page 11 - 5/27/2020 16:21:03
 
 
   codepages:
