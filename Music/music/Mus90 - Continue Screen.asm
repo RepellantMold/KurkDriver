@@ -2,7 +2,7 @@ Mus90_Continue_Screen_Header:
 smpsHeaderStartSong = 1
 	smpsHeaderVoice     Mus90_Continue_Screen_Voices
 	smpsHeaderChan      $06, $03
-	smpsHeaderTempo     $01, $07
+	smpsHeaderTempo     $01, $25
 
 	smpsHeaderDAC       Mus90_Continue_Screen_DAC
 	smpsHeaderFM        Mus90_Continue_Screen_FM1,	$E5, $08

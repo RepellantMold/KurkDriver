@@ -1,8 +1,8 @@
 Mus81_GHZ_Header:
-smpsHeaderStartSong = 1
+smpsHeaderStartSong = 3
 	smpsHeaderVoice     Mus81_GHZ_Voices
 	smpsHeaderChan      $06, $03
-	smpsHeaderTempo     $01, $03
+	smpsHeaderTempo     $01, $55
 
 	smpsHeaderDAC       Mus81_GHZ_DAC
 	smpsHeaderFM        Mus81_GHZ_FM1,	$F4, $12

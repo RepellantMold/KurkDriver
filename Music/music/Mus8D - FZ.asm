@@ -2,7 +2,7 @@ Mus8D_FZ_Header:
 smpsHeaderStartSong = 1
 	smpsHeaderVoice     Mus8D_FZ_Voices
 	smpsHeaderChan      $06, $03
-	smpsHeaderTempo     $02, $06
+	smpsHeaderTempo     $02, $3B
 
 	smpsHeaderDAC       Mus8D_FZ_DAC
 	smpsHeaderFM        Mus8D_FZ_FM1,	$00, $12

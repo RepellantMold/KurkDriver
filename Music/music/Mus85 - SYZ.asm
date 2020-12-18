@@ -2,7 +2,7 @@ Mus85_SYZ_Header:
 smpsHeaderStartSong = 1
 	smpsHeaderVoice     Mus85_SYZ_Voices
 	smpsHeaderChan      $06, $03
-	smpsHeaderTempo     $02, $03
+	smpsHeaderTempo     $02, $55
 
 	smpsHeaderDAC       Mus85_SYZ_DAC
 	smpsHeaderFM        Mus85_SYZ_FM1,	$F4, $11

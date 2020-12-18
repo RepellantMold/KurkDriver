@@ -2,7 +2,7 @@ Mus89_Special_Stage_Header:
 smpsHeaderStartSong = 1
 	smpsHeaderVoice     Mus89_Special_Stage_Voices
 	smpsHeaderChan      $07, $03
-	smpsHeaderTempo     $02, $08
+	smpsHeaderTempo     $02, $20
 
 	smpsHeaderDAC       Mus89_Special_Stage_DAC
 	smpsHeaderFM        Mus89_Special_Stage_FM1,	$DC, $18

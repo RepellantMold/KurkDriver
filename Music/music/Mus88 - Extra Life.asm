@@ -2,7 +2,7 @@ Mus88_Extra_Life_Header:
 smpsHeaderStartSong = 1
 	smpsHeaderVoice     Mus88_Extra_Life_Voices
 	smpsHeaderChan      $06, $03
-	smpsHeaderTempo     $02, $05
+	smpsHeaderTempo     $02, $33
 
 	smpsHeaderDAC       Mus88_Extra_Life_DAC
 	smpsHeaderFM        Mus88_Extra_Life_FM1,	$E8, $10

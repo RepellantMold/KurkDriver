@@ -2,7 +2,7 @@ Mus93_Get_Emerald_Header:
 smpsHeaderStartSong = 1
 	smpsHeaderVoice     Mus93_Get_Emerald_Voices
 	smpsHeaderChan      $07, $03
-	smpsHeaderTempo     $01, $06
+	smpsHeaderTempo     $01, $2B
 
 	smpsHeaderDAC       Mus93_Get_Emerald_DAC
 	smpsHeaderFM        Mus93_Get_Emerald_FM1,	$F4, $08
