@@ -1,19 +1,56 @@
+; NOTE: Because of the non-problematic stack usage at sub_71DC6,
+; you need to change Sonic 1's VBlanks slightly.
+;
+; You also need to compile it on ASM68K with "/o l+" (or change . to @)
+; which will allow "." to be the name of temporary labels.
+; If you wish, compile with "/o op+ /o os+ /o ow+ /o oz+ /o oaq+ /o osq+ /o omq+". as well.
+;
+; And it also uses the S3K tempo system, so you'll have to correct
+; the tempos by hand or use a tool for that. (same with byte_71A94)
+;
+; GUIDE TO INSTALL THIS IN SONIC 1 HIVEBRAIN
+; (REFERENCE ONLY FOR GITHUB USERS - LABELS ARE MENTIONED)
+; At the end of loc_D50/VBla_08, delete these lines
+;		cmpi.b	#$60,($FFFFF625).w
+;		bcc.s	Demo_Time
+;		move.b	#1,($FFFFF64F).w
+;		addq.l	#4,sp
+;		bra.w	loc_B64
+;
+; Then at the end of PalToCRAM/HBlank, remove these 2 lines
+; 		tst.b	($FFFFF64F).w
+;		bne.s	loc_119E
+;
+; And the routine below that.
+;
+;loc_119E:				; XREF: PalToCRAM
+;		clr.b	($FFFFF64F).w
+;		movem.l	d0-a6,-(sp)
+;		bsr.w	Demo_Time
+;		jsr	sub_71B4C
+;		movem.l	(sp)+,d0-a6
+;		rte
+;
+; Next change loc_B5E/VBla_Music to this
+;
+;               move	#$2300,sr       ; enable interrupts (we can accept horizontal interrupts from now on)
+;               bset	#0,($FFFFF64F).w; set "SMPS running flag"
+;               bne.s	loc_B64		; if it was set already, don't call another instance of SMPS
+;        	jsr	sub_71B4C	; run SMPS
+;               clr.b	($FFFFF64F).w	; reset "SMPS running flag"
+;
+; Then remove every Z80 stop and start from the VBlanks
+
 SoundDriverLoad:			; XREF: GameClrRAM; TitleScreen
-		nop	
 		move.w	#$100,($A11100).l ; stop the Z80
 		move.w	#$100,($A11200).l ; reset the Z80
 		lea	(Kos_Z80).l,a0	; load sound driver
 		lea	($A00000).l,a1
-		;bsr.w	KosDec		; decompress
-		jsr	KosDec		; decompress
-		move.w	#0,($A11200).l
-		nop	
-		nop	
-		nop	
-		nop	
+		jsr	KosDec		; Change 'KosDec' to the name of your Kosinski
+		move.w	#0,($A11200).l	; decompressor if you changed the name of it.
 		move.w	#$100,($A11200).l ; reset the Z80
 		move.w	#0,($A11100).l	; start	the Z80
-		rts	
+		rts
 ; End of function SoundDriverLoad
 
 Go_SoundTypes:	dc.l SoundTypes		; XREF: Sound_Play
@@ -25,10 +62,12 @@ Go_PSGIndex:	dc.l PSG_Index		; XREF: sub_72926
 ; ---------------------------------------------------------------------------
 ; PSG instruments used in music
 ; ---------------------------------------------------------------------------
+PSG_Index:
 		dc.l  		PSG_Tone00,PSG_Tone01,PSG_Tone02,PSG_Tone03
 		dc.l 		PSG_Tone04,PSG_Tone05,PSG_Tone06,PSG_Tone07
-		dc.l		PSG_Tone08
-					
+		dc.l		PSG_Tone08,PSG_Tone09,PSG_Tone0A,PSG_Tone0B
+		dc.l		PSG_Tone0C,PSG_Tone0D
+
 PSG_Tone00:
 		dc.b   	0,	 0,  0,	 1,  1,	 1,  2,	 2,  2,	 3,  3,	 3
 		dc.b	4,	 4,  4,	 5,  5,	 5,  6,	 6,  6,	 7,$80
@@ -59,9 +98,52 @@ PSG_Tone07:
 PSG_Tone08:
 		dc.b   	0,	 1,  2,	 3,  4,	 5,  6,	 7,  8,	 9,$0A,$0B
 		dc.b	$0C,$0D,$0E,$0F,$80
+PSG_Tone09:
+	   	dc.b 	0, 0, 0, 0, 0, 0, 0,	0, 0, 0, 1, 1, 1, 1, 1,	1, 1, 1
+		dc.b	1, 1, 1, 1, 1, 1, 1,	1, 1, 1, 1, 1, 1, 1, 1,	1, 1, 1
+		dc.b 	1, 1, 1, 1, 2, 2, 2,	2, 2, 2, 2, 2, 2, 2, 3,	3, 3, 3
+		dc.b 	3, 3, 3, 3, 3, 3, 4,	$80
+PSG_Tone0A:
+	   	dc.b 	4, 4, 4, 3, 3, 3, 2,	2, 2, 1, 1, 1, 1, 1, 1,	1, 2, 2
+		dc.b 	2, 2, 2, 3, 3, 3, 3,	3, 4, $80
+PSG_Tone0B:
+	   	dc.b 	4, 4, 3, 3, 2, 2, 1,	1, 1, 1, 1, 1, 1, 1, 1,	1, 1, 1
+		dc.b 	1, 1, 1, 1, 1, 1, 1,	1, 2, 2, 2, 2, 2, 2, 2,	2, 2, 2
+		dc.b 	2, 2, 2, 2, 2, 2, 2,	2, 2, 2, 3, 3, 3, 3, 3,	3, 3, 3
+		dc.b 	3, 3, 3, 3, 3, 3, 3,	3, 3, 3, 3, 3, 4, 4, 4,	4, 4, 4
+		dc.b 	4, 4, 4, 4, 4, 4, 4,	4, 4, 4, 4, 4, 4, 4, 5,	5, 5, 5
+		dc.b 	5, 5, 5, 5, 5, 5, 5,	5, 5, 5, 5, 5, 5, 5, 5,	5, 6, 6
+		dc.b 	6, 6, 6, 6, 6, 6, 6,	6, 6, 6, 6, 6, 6, 6, 6,	6, 6, 6
+		dc.b 	7, $80
+PSG_Tone0C:
+	   	dc.b 	$0E,	$0D, $0C, $0B, $0A, 9, 8, 7, 6,	5, 4, 3, 2, 1
+		dc.b 	0, $80
+PSG_Tone0D:
+	   	dc.b 	0, 1, 3, $80
+		even
 
 ;THIS IS THE TABLE FOR SPEED SHOES TEMPO INCREASES! IF YOU ADD SONGS, ADD MORE VALUES HERE!
-byte_71A94:	dc.b 7,	$72, $73, $26, $15, 8, $FF, 5
+byte_71A94:
+	   	dc.b 	0		; GHZ
+		dc.b 	0		; LZ
+		dc.b 	0		; MZ
+		dc.b 	0		; SLZ
+		dc.b 	0		; SYZ
+		dc.b 	0		; SBZ
+		dc.b 	0		; Invincibility
+		dc.b 	0		; Extra Life
+		dc.b 	0		; Special Stage
+		dc.b 	0		; Title Screen
+		dc.b 	0		; Ending
+		dc.b 	0		; Boss
+		dc.b 	0		; FZ
+		dc.b 	0		; Sonic Got Through
+		dc.b 	0		; Game Over
+		dc.b 	0		; Continue Screen
+		dc.b 	0		; Credits
+		dc.b 	0		; Drowning
+		dc.b 	0		; Get Emerald
+		even
 ; ---------------------------------------------------------------------------
 ; Music	Pointers
 ; ---------------------------------------------------------------------------
@@ -73,8 +155,15 @@ MusicIndex:	dc.l Music81, Music82
 		dc.l Music8B, Music8C
 		dc.l Music8D, Music8E
 		dc.l Music8F, Music90
-		dc.l Music91, Music92
-		dc.l Music93
+		dc.l Music91, Music92 	; If you add more music, then uncomment these lines
+		dc.l Music93;, Music94
+		;dc.l Music95, Music96
+		;dc.l Music97, Music98
+		;dc.l Music99, Music9A
+		;dc.l Music9B, Music9C
+		;dc.l Music9D, Music9E
+		;dc.l Music9F
+		even
 ; ---------------------------------------------------------------------------
 ; Type of sound	being played ($90 = music; $70 = normal	sound effect)
 ; ---------------------------------------------------------------------------
@@ -85,6 +174,7 @@ SoundTypes:	dc.b $90, $90, $90, $90, $90, $90, $90,	$90, $90, $90, $90, $90, $90
 		dc.b $70, $70, $70, $70, $70, $70, $70,	$70, $70, $70, $70, $70, $70, $70, $70,	$80
 		dc.b $80, $80, $80, $80, $80, $80, $80,	$80, $80, $80, $80, $80, $80, $80, $80,	$90
 		dc.b $90, $90, $90, $90
+		even
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -92,9 +182,6 @@ SoundTypes:	dc.b $90, $90, $90, $90, $90, $90, $90,	$90, $90, $90, $90, $90, $90
 UpdateSoundDriver:
 sub_71B4C:				; XREF: loc_B10; PalToCRAM
 		move.w	#$100,($A11100).l ; stop the Z80
-		nop	
-		nop	
-		nop
 
 loc_71B5A:
 		btst	#0,($A11100).l
@@ -103,11 +190,6 @@ loc_71B5A:
 		btst	#7,($A01FFD).l
 		beq.s	loc_71B82
 		move.w	#0,($A11100).l	; start	the Z80
-		nop	
-		nop	
-		nop	
-		nop	
-		nop	
 		bra.s	sub_71B4C
 ; ===========================================================================
 
@@ -116,9 +198,15 @@ loc_71B82:
 		clr.b	$E(a6)
 		tst.b	3(a6)		; is music paused?
 		bne.w	loc_71E50	; if yes, branch
-		subq.b	#1,1(a6)
-		bne.s	loc_71B9E
-		jsr	sub_7260C(pc)
+        	move.b  2(a6),d0        ; get tempo to d0
+        	add.b   d0,1(a6)        ; add to accumulator
+        	bcc.s   loc_71B9E        ; if carry clear, branch
+
+.ch =    $40+$E
+    rept 10
+        addq.b    #1,.ch(a6)        ; add 1 to duration
+.ch =        .ch+$30
+    endr
 
 loc_71B9E:
 		move.b	4(a6),d0
@@ -131,7 +219,7 @@ loc_71BA8:
 		jsr	sub_7267C(pc)
 
 loc_71BB2:
-		tst.w	$A(a6)		; is music or sound being played?
+		tst.l	$A(a6)		; is music or sound being played?
 		beq.s	loc_71BBC	; if not, branch
 		jsr	Sound_Play(pc)
 
@@ -206,7 +294,15 @@ loc_71C38:
 
 loc_71C44:
 		move.w	#0,($A11100).l	; start	the Z80
-		rts	
+		btst 	#6,($FFFFFFF8).w; is Megadrive PAL?
+		beq.s 	.dontcount 	; if not, branch
+		cmpi.b 	#5,($FFFFFFFF).w; 5th frame? - change this RAM adress if you desire another one
+		bne.s 	.end 		; if not, branch
+		clr.b 	($FFFFFFFF).w	; reset counter
+		bra.w 	sub_71B4C 	; run sound driver again
+.end:		addq.b 	#1,($FFFFFFFF).w; add 1 to frame count
+.dontcount:
+		rts
 ; End of function sub_71B4C
 
 
@@ -261,7 +357,7 @@ locret_71CAA:
 loc_71CAC:
 		subi.b	#$88,d0
 		move.b	byte_71CC4(pc,d0.w),d0
-		move.b	d0,($A000EA).l
+		move.b	d0,($A000C0).l
 		move.b	#$83,($A01FFF).l
 		rts	
 ; End of function sub_71C4E
@@ -418,42 +514,47 @@ locret_71DC4:
 
 
 sub_71DC6:				; XREF: sub_71CCA; sub_72850
-		addq.w	#4,sp
-		btst	#3,(a5)
-		beq.s	locret_71E16
-		tst.b	$18(a5)
-		beq.s	loc_71DDA
-		subq.b	#1,$18(a5)
-		rts	
+        btst    #1,(a5)     ; Is note playing?
+        bne.s   .dontreturn ; no - return
+        btst    #3,(a5)     ; Is modulation active?
+        beq.s   .dontreturn ; Return if not
+        tst.b   $18(a5)     ; Has modulation wait expired?
+        beq.s   .waitdone   ; If yes, branch
+        subq.b  #1,$18(a5)  ; Update wait timeout
+       
+.dontreturn:
+        addq.w  #4,sp       ; ++ Do not return to caller (but see below)
+        rts
 ; ===========================================================================
-
-loc_71DDA:
-		subq.b	#1,$19(a5)
-		beq.s	loc_71DE2
-		rts	
+ 
+.waitdone:
+        subq.b  #1,$19(a5)  ; Update speed
+        beq.s   .updatemodulation   ; If it expired, want to update modulation
+        addq.w  #4,sp       ; ++ Do not return to caller (but see below)
+        rts
 ; ===========================================================================
-
-loc_71DE2:
-		movea.l	$14(a5),a0
-		move.b	1(a0),$19(a5)
-		tst.b	$1B(a5)
-		bne.s	loc_71DFE
-		move.b	3(a0),$1B(a5)
-		neg.b	$1A(a5)
-		rts	
+ 
+.updatemodulation:
+        movea.l $14(a5),a0  ; Get modulation data
+        move.b  1(a0),$19(a5)   ; Restore modulation speed
+        tst.b   $1B(a5)     ; Check number of steps
+        bne.s   .calcfreq   ; If nonzero, branch
+        move.b  3(a0),$1B(a5)   ; Restore from modulation data
+        neg.b   $1A(a5)     ; Negate modulation delta
+        addq.w  #4,sp       ; ++ Do not return to caller (but see below)
+        rts
 ; ===========================================================================
-
-loc_71DFE:
-		subq.b	#1,$1B(a5)
-		move.b	$1A(a5),d6
-		ext.w	d6
-		add.w	$1C(a5),d6
-		move.w	d6,$1C(a5)
-		add.w	$10(a5),d6
-		subq.w	#4,sp
-
-locret_71E16:
-		rts	
+ 
+.calcfreq:
+        subq.b  #1,$1B(a5)  ; Update modulation steps
+        move.b  $1A(a5),d6  ; Get modulation delta
+        ext.w   d6
+        add.w   $1C(a5),d6  ; Add cumulative modulation change
+        move.w  d6,$1C(a5)  ; Store it
+        add.w   $10(a5),d6  ; Add note frequency to it
+ 
+.locret:
+        rts
 ; End of function sub_71DC6
 
 
@@ -494,7 +595,7 @@ loc_71E4A:
 loc_71E50:				; XREF: sub_71B4C
 		bmi.s	loc_71E94
 		cmpi.b	#2,3(a6)
-		beq.w	loc_71EFE
+		beq.w	loc_71C44
 		move.b	#2,3(a6)
 		moveq	#2,d3
 		move.b	#-$4C,d0
@@ -557,14 +658,12 @@ loc_71EDC:
 
 		lea	$340(a6),a5
 		btst	#7,(a5)
-		beq.s	loc_71EFE
+		beq.w	loc_71C44
 		btst	#2,(a5)
-		bne.s	loc_71EFE
+		bne.w	loc_71C44
 		move.b	#-$4C,d0
 		move.b	$A(a5),d1
 		jsr	sub_72722(pc)
-
-loc_71EFE:
 		bra.w	loc_71C44
 
 ; ---------------------------------------------------------------------------
@@ -623,12 +722,8 @@ Sound_ChkValue:				; XREF: sub_71B4C
 		move.b	#$80,9(a6)	; reset	music flag
 		cmpi.b	#$9F,d7
 		bls.w	Sound_81to9F	; music	$81-$9F
-		cmpi.b	#$A0,d7
-		bcs.w	locret_71F8C
 		cmpi.b	#$CF,d7
 		bls.w	Sound_A0toCF	; sound	$A0-$CF
-		cmpi.b	#$D0,d7
-		bcs.w	locret_71F8C
 		cmpi.b	#$E0,d7
 		bcs.w	Sound_D0toDF	; sound	$D0-$DF
 		cmpi.b	#$E4,d7
@@ -660,21 +755,28 @@ Sound_ExIndex:
 ; ---------------------------------------------------------------------------
 
 Sound_E1:				; XREF: Sound_ExIndex
-		move.b	#$88,($A01FFF).l
-		move.w	#0,($A11100).l	; start	the Z80
-		move.w	#$11,d1
+		move.b  #$B6, d0    ; Register: FM3/6 Panning
+        	move.b  #$C0, d1    ; Value: Enable both channels
+        	jsr 	sub_72764(pc)   ; Write to YM2612 Port 1 (for FM6)
 
-loc_71FC0:
-		move.w	#-1,d0
-
-loc_71FC4:
-		nop	
-		dbf	d0,loc_71FC4
-
-		dbf	d1,loc_71FC0
-
-		addq.w	#4,sp
-		rts	
+		lea	(SegaPCM).l,a2			; Load the SEGA PCM sample into a2. It's important that we use a2 since a0 and a1 are going to be used up ahead when reading the joypad ports 
+		move.l	#(SegaPCM_End-SegaPCM),d3			; Load the size of the SEGA PCM sample into d3 
+		move.b	#$2A,($A04000).l		; $A04000 = $2A -> Write to DAC channel
+PlayPCM_Loop:
+		move.b	(a2)+,($A04001).l		; Write the PCM data (contained in a2) to $A04001 (YM2612 register D0)
+		move.w	#$14,d0				; Write the pitch ($14 in this case) to d0
+		dbeq	d0,*				; Decrement d0; jump to itself if not 0. (for pitch control, avoids playing the sample too fast)
+		sub.l	#1,d3				; Subtract 1 from the PCM sample size
+		beq.s	return_PlayPCM			; If d3 = 0, we finished playing the PCM sample, so stop playing, leave this loop, and unfreeze the 68K 
+		lea	($FFFFF604).w,a0		; address where JoyPad states are written 
+		lea	($A10003).l,a1			; address where JoyPad states are read from 
+		jsr	(Joypad_Read).w			; Read only the first joypad port. It's important that we do NOT do the two ports, we don't have the cycles for that 
+		btst	#7,($FFFFF604).w		; Check for Start button
+		bne.s	return_PlayPCM			; If start is pressed, stop playing, leave this loop, and unfreeze the 68K
+		bra.s	PlayPCM_Loop			; Otherwise, continue playing PCM sample
+return_PlayPCM: 
+		addq.w	#4,sp 
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Play music track $81-$9F
@@ -738,18 +840,18 @@ loc_7202C:
 
 loc_72068:
 		move.b	d0,2(a6)
-		move.b	d0,1(a6)
+		clr.b   1(a6)
 		moveq	#0,d1
 		movea.l	a4,a3
 		addq.w	#6,a4
+		move.b	4(a3),d4
+		moveq	#$30,d6
+		move.b	#1,d5
 		moveq	#0,d7
 		move.b	2(a3),d7
 		beq.w	loc_72114
 		subq.b	#1,d7
 		move.b	#-$40,d1
-		move.b	4(a3),d4
-		moveq	#$30,d6
-		move.b	#1,d5
 		lea	$40(a6),a1
 		lea	byte_721BA(pc),a2
 
@@ -916,6 +1018,7 @@ Sound_notA7:
 		move.w	(a1)+,d1
 		add.l	a3,d1
 		move.b	(a1)+,d5
+		moveq	#0,d7
 		move.b	(a1)+,d7
 		subq.b	#1,d7
 		moveq	#$30,d6
@@ -1027,6 +1130,7 @@ Sound_D0toDF:				; XREF: Sound_ChkValue
 		add.l	a3,d0
 		move.l	d0,$20(a6)
 		move.b	(a1)+,d5
+		moveq	#0,d7
 		move.b	(a1)+,d7
 		subq.b	#1,d7
 		moveq	#$30,d6
@@ -1112,6 +1216,7 @@ loc_723EA:
 		bne.s	loc_72416
 		tst.b	$340(a6)
 		bpl.s	loc_72416
+		movea.l	a5,a3
 		lea	$340(a6),a5
 		movea.l	$20(a6),a1
 		bra.s	loc_72428
@@ -1318,7 +1423,7 @@ Sound_E4:				; XREF: Sound_ChkValue; Sound_ExIndex; sub_72504
 		moveq	#0,d1
 		jsr	sub_7272E(pc)
 		movea.l	a6,a0
-		move.w	#$E3,d0
+		move.w	#$F3,d0
 
 loc_725B6:
 		clr.l	(a0)+
@@ -1337,7 +1442,7 @@ sub_725CA:				; XREF: Sound_ChkValue
 		move.b	$27(a6),d2
 		move.b	$2A(a6),d3
 		move.b	$26(a6),d4
-		move.w	$A(a6),d5
+		move.l	$A(a6),d5
 		move.w	#$87,d0
 
 loc_725E4:
@@ -1348,7 +1453,7 @@ loc_725E4:
 		move.b	d2,$27(a6)
 		move.b	d3,$2A(a6)
 		move.b	d4,$26(a6)
-		move.w	d5,$A(a6)
+		move.l	d5,$A(a6)
 		move.b	#$80,9(a6)
 		jsr	sub_7256A(pc)
 		bra.w	sub_729B6
@@ -1445,11 +1550,6 @@ loc_726B4:
 		bpl.s	loc_726CC
 		subq.b	#1,9(a5)
 		move.b	9(a5),d6
-		cmpi.b	#$10,d6
-		bcs.s	loc_726C8
-		moveq	#$F,d6
-
-loc_726C8:
 		jsr	sub_7296A(pc)
 
 loc_726CC:
@@ -1533,21 +1633,14 @@ sub_72722:				; XREF: sub_71E18; sub_72C4E; sub_72CB4
 
 
 sub_7272E:				; XREF: loc_71E6A
-		move.b	($A04000).l,d2
-		btst	#7,d2
-		bne.s	sub_7272E
-		move.b	d0,($A04000).l
-		nop	
-		nop	
-		nop	
-
-loc_72746:
-		move.b	($A04000).l,d2
-		btst	#7,d2
-		bne.s	loc_72746
-
-		move.b	d1,($A04001).l
-		rts	
+		lea    ($A04000).l,a0
+.busywait:     	btst   #7,(a0)
+        	bne.s  .busywait
+		move.b d0,(a0)
+.busywait_1:	btst   #7,(a0)
+		bne.s  .busywait_1
+		move.b d1,1(a0)
+		rts
 ; End of function sub_7272E
 
 ; ===========================================================================
@@ -1561,20 +1654,13 @@ loc_7275A:				; XREF: sub_72722
 
 
 sub_72764:				; XREF: loc_71E6A; Sound_ChkValue; sub_7256A; sub_72764
-		move.b	($A04000).l,d2
-		btst	#7,d2
-		bne.s	sub_72764
-		move.b	d0,($A04002).l
-		nop	
-		nop	
-		nop	
-
-loc_7277C:
-		move.b	($A04000).l,d2
-		btst	#7,d2
-		bne.s	loc_7277C
-
-		move.b	d1,($A04003).l
+        	lea    ($A04000).l,a0
+.busywait:     	btst   #7,(a0)
+        	bne.s  .busywait
+        	move.b d0,2(a0)
+.busywait_1:   	btst   #7,(a0)
+        	bne.s  .busywait_1
+        	move.b d1,3(a0)
 		rts	
 ; End of function sub_72764
 
@@ -1738,9 +1824,6 @@ loc_7292E:				; XREF: sub_72850
 
 loc_72960:
 		add.w	d0,d6
-		cmpi.b	#$10,d6
-		bcs.s	sub_7296A
-		moveq	#$F,d6
 ; End of function sub_72926
 
 
@@ -1756,6 +1839,10 @@ sub_7296A:				; XREF: sub_72504; sub_7267C; sub_72926
 		bne.s	loc_7298C
 
 loc_7297C:
+          	cmpi.b  #$10, d6    ; Is volume $10 or higher?
+        	blo.s   L_psgsendvol    ; Branch if not
+        	moveq   #$F, d6     ; Limit to silence and fall through
+L_psgsendvol:
 		or.b	1(a5),d6
 		addi.b	#$10,d6
 		move.b	d6,($C00011).l
@@ -1769,14 +1856,15 @@ loc_7298C:
 		beq.s	loc_7297C
 		tst.b	$12(a5)
 		bne.s	loc_7297C
-		rts	
+		rts
 ; End of function sub_7296A
 
 ; ===========================================================================
 
 loc_7299A:				; XREF: sub_72926
-		subq.b	#1,$C(a5)
-		rts	
+        	subq.b 	#1,$C(a5)
+        	subq.b  #1,$C(a5)
+        	jsr    	loc_7292E
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -1789,6 +1877,9 @@ loc_729A6:				; XREF: Snd_FadeOut2
 		move.b	1(a5),d0
 		ori.b	#$1F,d0
 		move.b	d0,($C00011).l
+        	cmpi.b  #$DF,d0                ; Are stopping PSG3?
+	        bne.s   locret_729B4
+        	move.b  #$FF,($C00011).l        ; If so, stop noise channel while we're at it
 
 locret_729B4:
 		rts	
@@ -1959,11 +2050,22 @@ loc_72B66:
 		bset	#1,(a5)
 		jsr	sub_729A0(pc)
 		add.b	d6,9(a5)
+        	cmpi.b  #$E0,1(a5) ; is this the Noise Channel?
+        	bne.s   loc_72B78  ; no - skip
+        	move.b  $1F(a5),($C00011).l    ; restore Noise setting
 
 loc_72B78:
 		adda.w	#$30,a5
 		dbf	d7,loc_72B66
 		movea.l	a3,a5
+		tst.b	$40(a6)			; is the DAC channel running?
+		bmi.s	Restore_NoFM6		; if it is, branch
+
+		moveq	#$2B,d0			; DAC enable/disable register
+		moveq	#0,d1			; Disable DAC
+		jsr	sub_7272E(pc)
+
+Restore_NoFM6:
 		move.b	#$80,$24(a6)
 		move.b	#$28,$26(a6)
 		clr.b	$27(a6)
@@ -1974,15 +2076,7 @@ loc_72B78:
 
 loc_72B9E:				; XREF: loc_72A64
 		move.b	(a4)+,2(a5)
-		tst.b	$40(a6)			; is the DAC channel running?
-		bmi.s	Restore_NoFM6		; if it is, branch
-
-		moveq	#$2B,d0			; DAC enable/disable register
-		moveq	#0,d1			; Disable DAC
-		jsr	sub_7272E(pc)
-
-Restore_NoFM6:
-		rts	
+		rts
 ; ===========================================================================
 
 loc_72BA4:				; XREF: loc_72A64
@@ -2339,13 +2433,9 @@ loc_72E64:				; XREF: loc_72A64
 		move.b	#$F,d1
 		bra.w	sub_7272E
 ; ===========================================================================
-Kos_Z80:	incbin	sound\z80_1.bin
-		dc.w ((SegaPCM&$FF)<<8)+((SegaPCM&$FF00)>>8)
-		dc.b $21
-		dc.w (((EndOfRom-SegaPCM)&$FF)<<8)+(((EndOfRom-SegaPCM)&$FF00)>>8)
-		incbin	sound\z80_2.bin
+Kos_Z80:	incbin	z80.bin
 		even
-Music81:	include "Music/music/Mus81 - GHZ.asm"	
+Music81:	include "Music/music/Mus81 - GHZ.asm"
 			even
 Music82:	include "Music/music/Mus82 - LZ.asm"
 			even
@@ -2387,7 +2477,6 @@ Music93:	include "Music/music/Mus93 - Get Emerald.asm"
 ; Sound	effect pointers
 ; ---------------------------------------------------------------------------
 SoundIndex:	dc.l SoundA0, SoundA1, SoundA2,	SoundA3, SoundA4, SoundA5
-					; DATA XREF: ROM:Go_SoundIndexo
 		dc.l SoundA6, SoundA7, SoundA8,	SoundA9, SoundAA, SoundAB
 		dc.l SoundAC, SoundAD, SoundAE,	SoundAF, SoundB0, SoundB1
 		dc.l SoundB2, SoundB3, SoundB4,	SoundB5, SoundB6, SoundB7
@@ -2395,7 +2484,7 @@ SoundIndex:	dc.l SoundA0, SoundA1, SoundA2,	SoundA3, SoundA4, SoundA5
 		dc.l SoundBE, SoundBF, SoundC0,	SoundC1, SoundC2, SoundC3
 		dc.l SoundC4, SoundC5, SoundC6,	SoundC7, SoundC8, SoundC9
 		dc.l SoundCA, SoundCB, SoundCC,	SoundCD, SoundCE, SoundCF
-SoundD0Index:	dc.l SoundD0		; DATA XREF: ROM:Go_SoundD0o
+SoundD0Index:	dc.l SoundD0
 SoundA0:	include "Music/sfx/SndA0 - Jump.asm"
 			even
 SoundA1:	include "Music/sfx/SndA1 - Lamppost.asm"
@@ -2403,7 +2492,7 @@ SoundA1:	include "Music/sfx/SndA1 - Lamppost.asm"
 SoundA2:	include "Music/sfx/SndA2.asm"
 			even	
 SoundA3:	include "Music/sfx/SndA3 - Death.asm"
-			even	
+			even
 SoundA4:	include "Music/sfx/SndA4 - Skid.asm"
 			even
 SoundA5:	include "Music/sfx/SndA5.asm"
@@ -2494,5 +2583,5 @@ SoundCF:	include "Music/sfx/SndCF - Signpost.asm"
 			even
 SoundD0:	include "Music/sfx/SndD0 - Waterfall.asm"
 			even
-SegaPCM:	incbin "Music/SegaPCM.bin"		
-                        even
+SegaPCM:	incbin "Music/SegaPCM.bin"
+SegaPCM_end:	even

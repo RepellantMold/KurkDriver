@@ -2,7 +2,7 @@ Mus86_SBZ_Header:
 smpsHeaderStartSong = 1
 	smpsHeaderVoice     Mus86_SBZ_Voices
 	smpsHeaderChan      $06, $03
-	smpsHeaderTempo     $02, $05
+	smpsHeaderTempo     $02, $33
 
 	smpsHeaderDAC       Mus86_SBZ_DAC
 	smpsHeaderFM        Mus86_SBZ_FM1,	$F4, $0D

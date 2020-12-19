@@ -2,7 +2,7 @@ Mus82_LZ_Header:
 smpsHeaderStartSong = 1
 	smpsHeaderVoice     Mus82_LZ_Voices
 	smpsHeaderChan      $06, $03
-	smpsHeaderTempo     $02, $06
+	smpsHeaderTempo     $02, $2B
 
 	smpsHeaderDAC       Mus82_LZ_DAC
 	smpsHeaderFM        Mus82_LZ_FM1,	$F4, $0C

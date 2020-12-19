@@ -2,7 +2,7 @@ Mus92_Drowning_Header:
 smpsHeaderStartSong = 1
 	smpsHeaderVoice     Mus92_Drowning_Voices
 	smpsHeaderChan      $06, $00
-	smpsHeaderTempo     $01, $02
+	smpsHeaderTempo     $01, $80
 
 	smpsHeaderDAC       Mus92_Drowning_DAC
 	smpsHeaderFM        Mus92_Drowning_FM1,	$0C, $08
@@ -17,13 +17,13 @@ Mus92_Drowning_FM1:
 	smpsNop             $01
 	smpsNoteFill        $05
 	smpsCall            Mus92_Drowning_Call01
-	smpsSetTempoMod     $03
+	smpsSetTempoMod     $55
 	smpsCall            Mus92_Drowning_Call01
-	smpsSetTempoMod     $04
+	smpsSetTempoMod     $40
 	smpsCall            Mus92_Drowning_Call01
-	smpsSetTempoMod     $06
+	smpsSetTempoMod     $2B
 	smpsCall            Mus92_Drowning_Call01
-	smpsSetTempoMod     $0A
+	smpsSetTempoMod     $1A
 	smpsCall            Mus92_Drowning_Call01
 	dc.b	nC5, $06
 	smpsNop             $01

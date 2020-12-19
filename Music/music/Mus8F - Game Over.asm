@@ -2,7 +2,7 @@ Mus8F_Game_Over_Header:
 smpsHeaderStartSong = 1
 	smpsHeaderVoice     Mus8F_Game_Over_Voices
 	smpsHeaderChan      $06, $03
-	smpsHeaderTempo     $02, $13
+	smpsHeaderTempo     $02, $0D
 
 	smpsHeaderDAC       Mus8F_Game_Over_DAC
 	smpsHeaderFM        Mus8F_Game_Over_FM1,	$E8, $0A

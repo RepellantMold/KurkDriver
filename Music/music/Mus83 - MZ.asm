@@ -2,7 +2,7 @@ Mus83_MZ_Header:
 smpsHeaderStartSong = 1
 	smpsHeaderVoice     Mus83_MZ_Voices
 	smpsHeaderChan      $06, $03
-	smpsHeaderTempo     $02, $09
+	smpsHeaderTempo     $02, $1C
 
 	smpsHeaderDAC       Mus83_MZ_DAC
 	smpsHeaderFM        Mus83_MZ_FM1,	$E8, $15

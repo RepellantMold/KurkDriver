@@ -48,8 +48,6 @@ e_pos	equ	6	; end offset (in last bank)
 ; ---------------------------------------------------------------
 
 	di				; disable interrupts
-	di
-	di
 
 	; Setup variables
 	ld	sp,Stack		; init SP
@@ -221,6 +219,17 @@ PauseDAC:
 StopDAC:
 	ld	(iy+1),80h		; stop sound
 	jp	Idle_Loop
+	
+; ---------------------------------------------------------------
+; Best cycles per loop:	221/2
+; Max possible rate:	3,550 kHz / 111 = 32 kHz (PAL)
+; ---------------------------------------------------------------
+                                        
+	align	100h	; it's important to align this way, or the code above won't work properly
+
+DPCM_DeltaArray:
+	db	0, 1, 2, 4, 8, 10h, 20h, 40h
+	db	-80h, -1, -2, -4, -8, -10h, -20h, -40h
 
 
 ; ===============================================================
@@ -336,7 +345,7 @@ Process_PCM:
 	jr	nz,+			; 7/12	; if last bank isn't reached, branch
 	dec	hl			; 6	; decrease number of bytes to play in last bank
 	or	h			; 4	; is hl positive?
-	jp	p,+++			; 10	; if yes, quit playback loop
+	jp	p,QuitPlaybackLoop	; 10	; if yes, quit playback loop
 	exx				; 4	;
 	; Cycles: 43
 
@@ -356,10 +365,6 @@ Process_PCM:
 +	ld	h,80h			; restore base addr
 	call	LoadNextBank
 	jp	-
-
-	; Quit playback loop
-+	exx
-	jp	Event_EndPlayback
 
 ; ---------------------------------------------------------------
 ; Best cycles per loop:	122
@@ -436,7 +441,7 @@ Process_DPCM:
 	jr	nz,+			; 7/12	; if last bank isn't reached, branch
 	dec	hl			; 6	; decrease number of bytes to play in last bank
 	or	h			; 4	; is hl positive?
-	jp	p,+++			; 10	; if yes, quit playback loop
+	jp	p,QuitPlaybackLoop	; 10	; if yes, quit playback loop
 	exx				; 4	;
 	; Cycles: 43
 
@@ -457,20 +462,13 @@ Process_DPCM:
 	call	LoadNextBank
 	jp	-
 
-	; Quit playback loop
-+	exx
-	jp	Event_EndPlayback
-
 ; ---------------------------------------------------------------
-; Best cycles per loop:	221/2
-; Max possible rate:	3,550 kHz / 111 = 32 kHz (PAL)
+; Quit playback loop (used by Process_PCM/Process_DPCM)
 ; ---------------------------------------------------------------
-                                        
-	align	100h	; it's important to align this way, or the code above won't work properly
 
-DPCM_DeltaArray:
-	db	0, 1, 2, 4, 8, 10h, 20h, 40h
-	db	-80h, -1, -2, -4, -8, -10h, -20h, -40h
+QuitPlaybackLoop:
+	exx
+    	jp	Event_EndPlayback
 
 ; ---------------------------------------------------------------
 ; NOTICE ABOUT PLAYBACK RATES:

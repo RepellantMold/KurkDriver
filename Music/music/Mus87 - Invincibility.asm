@@ -2,7 +2,7 @@ Mus87_Invincibility_Header:
 smpsHeaderStartSong = 1
 	smpsHeaderVoice     Mus87_Invincibility_Voices
 	smpsHeaderChan      $06, $03
-	smpsHeaderTempo     $01, $08
+	smpsHeaderTempo     $01, $20
 
 	smpsHeaderDAC       Mus87_Invincibility_DAC
 	smpsHeaderFM        Mus87_Invincibility_FM1,	$F4, $11
