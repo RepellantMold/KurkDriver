@@ -1,2 +1,2 @@
 # KurkDriver
-A SMPS driver based off of Sonic 1's and with several bug fixes and crap, nothing special.
+A version of SMPS that is kinda bad. I made this before I properly knew how to do sound driver coding
