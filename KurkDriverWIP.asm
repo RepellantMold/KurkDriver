@@ -1,7 +1,7 @@
 ; NOTE: Because of the non-problematic stack usage at sub_71DC6,
 ; you need to change Sonic 1's VBlanks slightly.
 ;
-; You also need to compile it on ASM68K with "/o l+" (or change . to @)
+; If you use ASM68K, compile with "/o l+" (or change . to @)
 ; which will allow "." to be the name of temporary labels.
 ; If you wish, compile with "/o op+ /o os+ /o ow+ /o oz+ /o oaq+ /o osq+ /o omq+". as well.
 ;
@@ -40,6 +40,8 @@
 ;               clr.b	($FFFFF64F).w	; reset "SMPS running flag"
 ;
 ; Then remove every Z80 stop and start from the VBlanks
+;
+
 
 SoundDriverLoad:			; XREF: GameClrRAM; TitleScreen
 		move.w	#$100,($A11100).l ; stop the Z80
@@ -122,7 +124,6 @@ PSG_Tone0D:
 	   	dc.b 	0, 1, 3, $80
 		even
 
-;THIS IS THE TABLE FOR SPEED SHOES TEMPO INCREASES! IF YOU ADD SONGS, ADD MORE VALUES HERE!
 byte_71A94:
 	   	dc.b 	0		; GHZ
 		dc.b 	0		; LZ
@@ -143,6 +144,18 @@ byte_71A94:
 		dc.b 	0		; Credits
 		dc.b 	0		; Drowning
 		dc.b 	0		; Get Emerald
+		dc.b 	0		; Music 94
+		dc.b 	0		; Music 95
+		dc.b 	0		; Music 96
+		dc.b 	0		; Music 97
+		dc.b 	0		; Music 98
+		dc.b 	0		; Music 99
+		dc.b 	0		; Music 9A
+		dc.b 	0		; Music 9B
+		dc.b 	0		; Music 9C
+		dc.b 	0		; Music 9D
+		dc.b 	0		; Music 9E
+		dc.b 	0		; Music 9F
 		even
 ; ---------------------------------------------------------------------------
 ; Music	Pointers
@@ -155,8 +168,8 @@ MusicIndex:	dc.l Music81, Music82
 		dc.l Music8B, Music8C
 		dc.l Music8D, Music8E
 		dc.l Music8F, Music90
-		dc.l Music91, Music92 	; If you add more music, then uncomment these lines
-		dc.l Music93;, Music94
+		dc.l Music91, Music92
+		dc.l Music93;, Music94		; Uncomment this if you have use all music slots
 		;dc.l Music95, Music96
 		;dc.l Music97, Music98
 		;dc.l Music99, Music9A
@@ -186,7 +199,6 @@ sub_71B4C:				; XREF: loc_B10; PalToCRAM
 loc_71B5A:
 		btst	#0,($A11100).l
 		bne.s	loc_71B5A
-
 		btst	#7,($A01FFD).l
 		beq.s	loc_71B82
 		move.w	#0,($A11100).l	; start	the Z80
@@ -296,7 +308,7 @@ loc_71C44:
 		move.w	#0,($A11100).l	; start	the Z80
 		btst 	#6,($FFFFFFF8).w; is Megadrive PAL?
 		beq.s 	.dontcount 	; if not, branch
-		cmpi.b 	#5,($FFFFFFFF).w; 5th frame? - change this RAM adress if you desire another one
+		cmpi.b 	#5,($FFFFFFFF).w; 5th frame? - change this RAM address if you desire another one
 		bne.s 	.end 		; if not, branch
 		clr.b 	($FFFFFFFF).w	; reset counter
 		bra.w 	sub_71B4C 	; run sound driver again
@@ -363,7 +375,7 @@ loc_71CAC:
 ; End of function sub_71C4E
 
 ; ===========================================================================
-byte_71CC4:	dc.b $12, $15, $1C, $1D, $FF, $FF
+byte_71CC4:	dc.b $15, $18, $1F, $20, $FF, $FF
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -755,26 +767,27 @@ Sound_ExIndex:
 ; ---------------------------------------------------------------------------
 
 Sound_E1:				; XREF: Sound_ExIndex
-		move.b  #$B6, d0    ; Register: FM3/6 Panning
-        	move.b  #$C0, d1    ; Value: Enable both channels
-        	jsr 	sub_72764(pc)   ; Write to YM2612 Port 1 (for FM6)
+		move.b  #$B6, d0    			; Register: FM3/6 Panning
+        	move.b  #$C0, d1    			; Value: Enable both channels
+        	jsr 	sub_72764(pc)   		; Write to YM2612 Port 1 (for FM6)
 
-		lea	(SegaPCM).l,a2			; Load the SEGA PCM sample into a2. It's important that we use a2 since a0 and a1 are going to be used up ahead when reading the joypad ports 
-		move.l	#(SegaPCM_End-SegaPCM),d3			; Load the size of the SEGA PCM sample into d3 
+		lea	(SegaPCM).l,a2			; Load the SEGA PCM sample into a2. It's important that we use a2 since a0 and a1 are going to be used up ahead when reading the joypad ports
+		move.l	#(SegaPCM_End-SegaPCM),d3	; Load the size of the SEGA PCM sample into d3
 		move.b	#$2A,($A04000).l		; $A04000 = $2A -> Write to DAC channel
 PlayPCM_Loop:
 		move.b	(a2)+,($A04001).l		; Write the PCM data (contained in a2) to $A04001 (YM2612 register D0)
-		move.w	#$14,d0				; Write the pitch ($14 in this case) to d0
-		dbeq	d0,*				; Decrement d0; jump to itself if not 0. (for pitch control, avoids playing the sample too fast)
-		sub.l	#1,d3				; Subtract 1 from the PCM sample size
-		beq.s	return_PlayPCM			; If d3 = 0, we finished playing the PCM sample, so stop playing, leave this loop, and unfreeze the 68K 
-		lea	($FFFFF604).w,a0		; address where JoyPad states are written 
-		lea	($A10003).l,a1			; address where JoyPad states are read from 
-		jsr	(Joypad_Read).w			; Read only the first joypad port. It's important that we do NOT do the two ports, we don't have the cycles for that 
+		;move.w	#$14,d0				; Write the pitch ($14 in this case) to d0
+		;dbeq	d0,*				; Decrement d0, jump to itself if not 0. (for pitch control, avoids playing the sample too fast)
+		; Uncomment if you want to use smaller samples and not have them play so fast
+		subq.l	#1,d3				; Subtract 1 from the PCM sample size
+		beq.s	return_PlayPCM			; If d3 = 0, we finished playing the PCM sample, so stop playing, leave this loop, and unfreeze the 68K
+		lea	($FFFFF604).w,a0		; address where JoyPad states are written
+		lea	($A10003).l,a1			; address where JoyPad states are read from
+		jsr	(Joypad_Read).w			; Read only the first joypad port. It's important that we do NOT do the two ports, we don't have the cycles for that
 		btst	#7,($FFFFF604).w		; Check for Start button
 		bne.s	return_PlayPCM			; If start is pressed, stop playing, leave this loop, and unfreeze the 68K
 		bra.s	PlayPCM_Loop			; Otherwise, continue playing PCM sample
-return_PlayPCM: 
+return_PlayPCM:
 		addq.w	#4,sp 
 		rts
 ; ===========================================================================
@@ -1661,7 +1674,7 @@ sub_72764:				; XREF: loc_71E6A; Sound_ChkValue; sub_7256A; sub_72764
 .busywait_1:   	btst   #7,(a0)
         	bne.s  .busywait_1
         	move.b d1,3(a0)
-		rts	
+		rts
 ; End of function sub_72764
 
 ; ===========================================================================
@@ -1877,7 +1890,7 @@ loc_729A6:				; XREF: Snd_FadeOut2
 		move.b	1(a5),d0
 		ori.b	#$1F,d0
 		move.b	d0,($C00011).l
-        	cmpi.b  #$DF,d0                ; Are stopping PSG3?
+        	cmpi.b  #$DF,d0                ; Are we stopping PSG3?
 	        bne.s   locret_729B4
         	move.b  #$FF,($C00011).l        ; If so, stop noise channel while we're at it
 
@@ -2018,7 +2031,9 @@ loc_72B14:				; XREF: loc_72A64
 loc_72B1E:
 		move.l	(a1)+,(a0)+
 		dbf	d0,loc_72B1E
-
+        	move.b  #$2B,d0    	; Register: DAC mode (bit 7 = enable)
+        	moveq   #$00,d1    	; Value: DAC mode disable
+        	jsr	sub_7272E(pc)	; Write to YM2612 Port 0
 		bset	#2,$40(a6)
 		movea.l	a5,a3
 		move.b	#$28,d6
@@ -2058,14 +2073,6 @@ loc_72B78:
 		adda.w	#$30,a5
 		dbf	d7,loc_72B66
 		movea.l	a3,a5
-		tst.b	$40(a6)			; is the DAC channel running?
-		bmi.s	Restore_NoFM6		; if it is, branch
-
-		moveq	#$2B,d0			; DAC enable/disable register
-		moveq	#0,d1			; Disable DAC
-		jsr	sub_7272E(pc)
-
-Restore_NoFM6:
 		move.b	#$80,$24(a6)
 		move.b	#$28,$26(a6)
 		clr.b	$27(a6)
@@ -2436,43 +2443,67 @@ loc_72E64:				; XREF: loc_72A64
 Kos_Z80:	incbin	z80.bin
 		even
 Music81:	include "Music/music/Mus81 - GHZ.asm"
-			even
+		even
 Music82:	include "Music/music/Mus82 - LZ.asm"
-			even
+		even
 Music83:	include "Music/music/Mus83 - MZ.asm"
-			even
+		even
 Music84:	include "Music/music/Mus84 - SLZ.asm"
-			even
+		even
 Music85:	include "Music/music/Mus85 - SYZ.asm"
-			even
+		even
 Music86:	include "Music/music/Mus86 - SBZ.asm"
-			even
+		even
 Music87:	include "Music/music/Mus87 - Invincibility.asm"
-			even
+		even
 Music88:	include "Music/music/Mus88 - Extra Life.asm"
-			even
+		even
 Music89:	include "Music/music/Mus89 - Special Stage.asm"
-			even
+		even
 Music8A:	include "Music/music/Mus8A - Title Screen.asm"
-			even
+		even
 Music8B:	include "Music/music/Mus8B - Ending.asm"
-			even
+		even
 Music8C:	include "Music/music/Mus8C - Boss.asm"
-			even
+		even
 Music8D:	include "Music/music/Mus8D - FZ.asm"
-			even
+		even
 Music8E:	include "Music/music/Mus8E - Sonic Got Through.asm"
-			even
+		even
 Music8F:	include "Music/music/Mus8F - Game Over.asm"
-			even
+		even
 Music90:	include "Music/music/Mus90 - Continue Screen.asm"
-			even
+		even
 Music91:	include "Music/music/Mus91 - Credits.asm"
-			even
+		even
 Music92:	include "Music/music/Mus92 - Drowning.asm"
-			even
+		even
 Music93:	include "Music/music/Mus93 - Get Emerald.asm"
-			even
+		even
+;Music94:
+;		even
+;Music95:
+;		even
+;Music96:
+;		even
+;Music97:
+;		even
+;Music98:
+;		even
+;Music99:
+;		even
+;Music9A:
+;		even
+;Music9B:
+;		even
+;Music9C:
+;		even
+;Music9D:
+;		even
+;Music9E:
+;		even
+;Music9F:
+;		even
 ; ---------------------------------------------------------------------------
 ; Sound	effect pointers
 ; ---------------------------------------------------------------------------

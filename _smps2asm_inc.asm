@@ -1,7 +1,7 @@
 ; =============================================================================================
 ; Created by Flamewing, based on S1SMPS2ASM version 1.1 by Marc Gordon (AKA Cinossu)
 ; =============================================================================================
-SonicDriverVer:	equ	5
+SonicDriverVer:	equ	1
 align0	macro	val
 	cnop	0,\val
     endm
@@ -248,7 +248,6 @@ smpsHeaderVoiceUVB macro
 	if songStart<>*
 		fail "Missing smpsHeaderStartSong or smpsHeaderStartSongConvert"
 	endc
-	;dc.w	little_endian(z80_UniVoiceBank)
 	z80_ptr	z80_UniVoiceBank
 	endm
 
@@ -533,7 +532,6 @@ smpsHaltMusic macro flag
 smpsCopyData macro data,len
 	fail "Coord. Flag to copy data should not be used. Complain to Flamewing if any music uses it."
 	dc.b	$FF,$03
-	;dc.w	little_endian(data)
 	z80_ptr	data
 	dc.b	len
 	endm
@@ -651,12 +649,6 @@ vcTLMask4 set ((vcAlgorithm=7)<<7)
 vcTLMask3 set ((vcAlgorithm>=4)<<7)
 vcTLMask2 set ((vcAlgorithm>=5)<<7)
 vcTLMask1 set $80
-;	dc.b	(vcDT4<<4)+vcCF4 ,(vcDT3<<4)+vcCF3 ,(vcDT2<<4)+vcCF2 ,(vcDT1<<4)+vcCF1
-;	dc.b	(vcRS4<<6)+vcAR4 ,(vcRS3<<6)+vcAR3 ,(vcRS2<<6)+vcAR2 ,(vcRS1<<6)+vcAR1
-;	dc.b	(vcAM4<<5)+vcD1R4,(vcAM3<<5)+vcD1R3,(vcAM2<<5)+vcD1R2,(vcAM1<<5)+vcD1R1
-;	dc.b	vcD2R4           ,vcD2R3           ,vcD2R2           ,vcD2R1
-;	dc.b	(vcDL4<<4)+vcRR4 ,(vcDL3<<4)+vcRR3 ,(vcDL2<<4)+vcRR2 ,(vcDL1<<4)+vcRR1
-;	dc.b	vcTL4|vcTLMask4  ,vcTL3|vcTLMask3  ,vcTL2|vcTLMask2  ,vcTL1|vcTLMask1
 	dc.b	(vcDT4<<4)+vcCF4,(vcDT3<<4)+vcCF3,(vcDT2<<4)+vcCF2,(vcDT1<<4)+vcCF1
 	dc.b	(vcRS4<<6)+vcAR4,(vcRS3<<6)+vcAR3,(vcRS2<<6)+vcAR2,(vcRS1<<6)+vcAR1
 	dc.b	(vcAM4<<5)+vcD1R4,(vcAM3<<5)+vcD1R3,(vcAM2<<5)+vcD1R2,(vcAM1<<5)+vcD1R1
