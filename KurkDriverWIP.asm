@@ -61,6 +61,7 @@ Go_MusicIndex:	dc.l MusicIndex		; XREF: Sound_81to9F
 Go_SoundIndex:	dc.l SoundIndex		; XREF: Sound_A0toCF
 off_719A0:	dc.l byte_71A94		; XREF: Sound_81to9F
 Go_PSGIndex:	dc.l PSG_Index		; XREF: sub_72926
+		even
 ; ---------------------------------------------------------------------------
 ; PSG instruments used in music
 ; ---------------------------------------------------------------------------
@@ -69,47 +70,36 @@ PSG_Index:
 		dc.l 		PSG_Tone04,PSG_Tone05,PSG_Tone06,PSG_Tone07
 		dc.l		PSG_Tone08,PSG_Tone09,PSG_Tone0A,PSG_Tone0B
 		dc.l		PSG_Tone0C,PSG_Tone0D
+		even
 
-PSG_Tone00:
-		dc.b   	0,	 0,  0,	 1,  1,	 1,  2,	 2,  2,	 3,  3,	 3
+PSG_Tone00:	dc.b   	0,	 0,  0,	 1,  1,	 1,  2,	 2,  2,	 3,  3,	 3
 		dc.b	4,	 4,  4,	 5,  5,	 5,  6,	 6,  6,	 7,$80
-PSG_Tone01:
-		dc.b    0,   2,   4,   6,   8, $10, $80
-PSG_Tone02:
-		dc.b	0,   0,   1,   1,   2,   2,   3,   3,   4,   4
+PSG_Tone01:	dc.b    0,   2,   4,   6,   8, $10, $80
+PSG_Tone02:	dc.b	0,   0,   1,   1,   2,   2,   3,   3,   4,   4
 		dc.b 	5,   5,   6,   6,   7,   7, $80
-PSG_Tone03:
-		dc.b  	0,   0,   2,   3,   4,   4,   5,   5,   5,   6, $80
-PSG_Tone05:
-		dc.b   	3,	 3,  3,	 2,  2,	 2,  2,	 1,  1,	 1,  0,	 0
+PSG_Tone03:	dc.b  	0,   0,   2,   3,   4,   4,   5,   5,   5,   6, $80
+PSG_Tone05:	dc.b   	3,	 3,  3,	 2,  2,	 2,  2,	 1,  1,	 1,  0,	 0
 		dc.b	0,	 0,$80
-PSG_Tone04:
-		dc.b   	0,	 0,  0,	 0,  0,	 0,  0,	 0,  0,	 0,  1,	 1
+PSG_Tone04:	dc.b   	0,	 0,  0,	 0,  0,	 0,  0,	 0,  0,	 0,  1,	 1
 		dc.b	1,	 1,  1,	 1,  1,	 1,  1,	 1,  1,	 1
 		dc.b	1,	 1,  2,	 2,  2,	 2,  2,	 2,  2,	 2
 		dc.b   	3,	 3,  3,	 3,  3,	 3,  3,	 3,  4,$80
-PSG_Tone06:
-		dc.b   	0,	 0,  0,	 0,  0,	 0,  1,	 1,  1,	 1,  1,	 2
+PSG_Tone06:	dc.b   	0,	 0,  0,	 0,  0,	 0,  1,	 1,  1,	 1,  1,	 2
 		dc.b	2,	 2,  2,	 2,  3,	 3,  3,	 4,  4,	 4
 		dc.b	5,	 5,  5,	 6,  7,$80
-PSG_Tone07:
-		dc.b   	0,	 0,  0,	 0,  0,	 1,  1,	 1,  1,	 1,  2,	 2
+PSG_Tone07:	dc.b   	0,	 0,  0,	 0,  0,	 1,  1,	 1,  1,	 1,  2,	 2
 		dc.b	2,	 2,  2,	 2,  3,	 3,  3,	 3,  3,	 4
 		dc.b	4,	 4,  4,	 4,  5,	 5,  5,	 5,  5,	 6
 		dc.b   	6,	 6,  6,	 6,  7,	 7,  7,$80
-PSG_Tone08:
-		dc.b   	0,	 1,  2,	 3,  4,	 5,  6,	 7,  8,	 9,$0A,$0B
+PSG_Tone08:	dc.b   	0,	 1,  2,	 3,  4,	 5,  6,	 7,  8,	 9,$0A,$0B
 		dc.b	$0C,$0D,$0E,$0F,$80
-PSG_Tone09:
-	   	dc.b 	0, 0, 0, 0, 0, 0, 0,	0, 0, 0, 1, 1, 1, 1, 1,	1, 1, 1
+PSG_Tone09:   	dc.b 	0, 0, 0, 0, 0, 0, 0,	0, 0, 0, 1, 1, 1, 1, 1,	1, 1, 1
 		dc.b	1, 1, 1, 1, 1, 1, 1,	1, 1, 1, 1, 1, 1, 1, 1,	1, 1, 1
 		dc.b 	1, 1, 1, 1, 2, 2, 2,	2, 2, 2, 2, 2, 2, 2, 3,	3, 3, 3
 		dc.b 	3, 3, 3, 3, 3, 3, 4,	$80
-PSG_Tone0A:
-	   	dc.b 	4, 4, 4, 3, 3, 3, 2,	2, 2, 1, 1, 1, 1, 1, 1,	1, 2, 2
+PSG_Tone0A:   	dc.b 	4, 4, 4, 3, 3, 3, 2,	2, 2, 1, 1, 1, 1, 1, 1,	1, 2, 2
 		dc.b 	2, 2, 2, 3, 3, 3, 3,	3, 4, $80
-PSG_Tone0B:
-	   	dc.b 	4, 4, 3, 3, 2, 2, 1,	1, 1, 1, 1, 1, 1, 1, 1,	1, 1, 1
+PSG_Tone0B:   	dc.b 	4, 4, 3, 3, 2, 2, 1,	1, 1, 1, 1, 1, 1, 1, 1,	1, 1, 1
 		dc.b 	1, 1, 1, 1, 1, 1, 1,	1, 2, 2, 2, 2, 2, 2, 2,	2, 2, 2
 		dc.b 	2, 2, 2, 2, 2, 2, 2,	2, 2, 2, 3, 3, 3, 3, 3,	3, 3, 3
 		dc.b 	3, 3, 3, 3, 3, 3, 3,	3, 3, 3, 3, 3, 4, 4, 4,	4, 4, 4
@@ -117,13 +107,12 @@ PSG_Tone0B:
 		dc.b 	5, 5, 5, 5, 5, 5, 5,	5, 5, 5, 5, 5, 5, 5, 5,	5, 6, 6
 		dc.b 	6, 6, 6, 6, 6, 6, 6,	6, 6, 6, 6, 6, 6, 6, 6,	6, 6, 6
 		dc.b 	7, $80
-PSG_Tone0C:
-	   	dc.b 	$0E,	$0D, $0C, $0B, $0A, 9, 8, 7, 6,	5, 4, 3, 2, 1
+PSG_Tone0C:   	dc.b 	$0E,	$0D, $0C, $0B, $0A, 9, 8, 7, 6,	5, 4, 3, 2, 1
 		dc.b 	0, $80
-PSG_Tone0D:
-	   	dc.b 	0, 1, 3, $80
+PSG_Tone0D:   	dc.b 	0, 1, 3, $80
 		even
 
+;THIS IS THE TABLE FOR SPEED SHOES TEMPO INCREASES! IF YOU ADD SONGS, ADD MORE VALUES HERE!
 byte_71A94:
 	   	dc.b 	0		; GHZ
 		dc.b 	0		; LZ
@@ -144,18 +133,6 @@ byte_71A94:
 		dc.b 	0		; Credits
 		dc.b 	0		; Drowning
 		dc.b 	0		; Get Emerald
-		dc.b 	0		; Music 94
-		dc.b 	0		; Music 95
-		dc.b 	0		; Music 96
-		dc.b 	0		; Music 97
-		dc.b 	0		; Music 98
-		dc.b 	0		; Music 99
-		dc.b 	0		; Music 9A
-		dc.b 	0		; Music 9B
-		dc.b 	0		; Music 9C
-		dc.b 	0		; Music 9D
-		dc.b 	0		; Music 9E
-		dc.b 	0		; Music 9F
 		even
 ; ---------------------------------------------------------------------------
 ; Music	Pointers
@@ -169,13 +146,7 @@ MusicIndex:	dc.l Music81, Music82
 		dc.l Music8D, Music8E
 		dc.l Music8F, Music90
 		dc.l Music91, Music92
-		dc.l Music93;, Music94		; Uncomment this if you have use all music slots
-		;dc.l Music95, Music96
-		;dc.l Music97, Music98
-		;dc.l Music99, Music9A
-		;dc.l Music9B, Music9C
-		;dc.l Music9D, Music9E
-		;dc.l Music9F
+		dc.l Music93
 		even
 ; ---------------------------------------------------------------------------
 ; Type of sound	being played ($90 = music; $70 = normal	sound effect)
@@ -195,10 +166,6 @@ SoundTypes:	dc.b $90, $90, $90, $90, $90, $90, $90,	$90, $90, $90, $90, $90, $90
 UpdateSoundDriver:
 sub_71B4C:				; XREF: loc_B10; PalToCRAM
 		move.w	#$100,($A11100).l ; stop the Z80
-
-loc_71B5A:
-		btst	#0,($A11100).l
-		bne.s	loc_71B5A
 		btst	#7,($A01FFD).l
 		beq.s	loc_71B82
 		move.w	#0,($A11100).l	; start	the Z80
@@ -308,8 +275,8 @@ loc_71C44:
 		move.w	#0,($A11100).l	; start	the Z80
 		btst 	#6,($FFFFFFF8).w; is Megadrive PAL?
 		beq.s 	.dontcount 	; if not, branch
-		cmpi.b 	#5,($FFFFFFFF).w; 5th frame? - change this RAM address if you desire another one
-		bne.s 	.end 		; if not, branch
+		cmpi.b 	#5,($FFFFFFFF).w; 5th frame? - change this RAM adress if you desire another one
+		blo.s 	.end 		; if not, branch
 		clr.b 	($FFFFFFFF).w	; reset counter
 		bra.w 	sub_71B4C 	; run sound driver again
 .end:		addq.b 	#1,($FFFFFFFF).w; add 1 to frame count
@@ -371,7 +338,7 @@ loc_71CAC:
 		move.b	byte_71CC4(pc,d0.w),d0
 		move.b	d0,($A000C0).l
 		move.b	#$83,($A01FFF).l
-		rts	
+		rts
 ; End of function sub_71C4E
 
 ; ===========================================================================
@@ -783,7 +750,20 @@ PlayPCM_Loop:
 		beq.s	return_PlayPCM			; If d3 = 0, we finished playing the PCM sample, so stop playing, leave this loop, and unfreeze the 68K
 		lea	($FFFFF604).w,a0		; address where JoyPad states are written
 		lea	($A10003).l,a1			; address where JoyPad states are read from
-		jsr	(Joypad_Read).w			; Read only the first joypad port. It's important that we do NOT do the two ports, we don't have the cycles for that
+		move.b	#0,(a1)				; All this reads the JoyPad. (only the first one as we don't have cycles for the other one)
+		move.b	(a1),d0
+		lsl.b	#2,d0
+		andi.b	#$C0,d0
+		move.b	#$40,(a1)
+		move.b	(a1),d1
+		andi.b	#$3F,d1
+		or.b	d1,d0
+		not.b	d0
+		move.b	(a0),d1
+		eor.b	d0,d1
+		move.b	d0,(a0)+
+		and.b	d0,d1
+		move.b	d1,(a0)+
 		btst	#7,($FFFFF604).w		; Check for Start button
 		bne.s	return_PlayPCM			; If start is pressed, stop playing, leave this loop, and unfreeze the 68K
 		bra.s	PlayPCM_Loop			; Otherwise, continue playing PCM sample
@@ -2480,30 +2460,6 @@ Music92:	include "Music/music/Mus92 - Drowning.asm"
 		even
 Music93:	include "Music/music/Mus93 - Get Emerald.asm"
 		even
-;Music94:
-;		even
-;Music95:
-;		even
-;Music96:
-;		even
-;Music97:
-;		even
-;Music98:
-;		even
-;Music99:
-;		even
-;Music9A:
-;		even
-;Music9B:
-;		even
-;Music9C:
-;		even
-;Music9D:
-;		even
-;Music9E:
-;		even
-;Music9F:
-;		even
 ; ---------------------------------------------------------------------------
 ; Sound	effect pointers
 ; ---------------------------------------------------------------------------
